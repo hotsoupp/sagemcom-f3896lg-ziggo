@@ -1,0 +1,26 @@
+# Runs the Prometheus exporter on boot. Copy this file to
+# /etc/systemd/system/modem-exporter.service, edit the paths and User below,
+# then run sudo systemctl daemon-reload && sudo systemctl enable --now modem-exporter
+[Unit]
+Description=Sagemcom F3896LG (Ziggo) modem Prometheus exporter
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# Adjust these three to match where you cloned the repo and which user runs it.
+User=youruser
+WorkingDirectory=/opt/sagemcom-f3896lg-ziggo
+ExecStart=/usr/bin/python3 /opt/sagemcom-f3896lg-ziggo/exporter.py
+Environment=MODEM_HOST=https://192.168.100.1
+Environment=MODEM_INTERVAL=30
+Restart=always
+RestartSec=10
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+
+[Install]
+WantedBy=multi-user.target

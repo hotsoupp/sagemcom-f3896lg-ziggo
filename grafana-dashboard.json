@@ -1,0 +1,2499 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "10.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Status",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Modem",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 0,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "modem_up",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "1": {
+                  "text": "UP",
+                  "color": "green"
+                },
+                "0": {
+                  "text": "DOWN",
+                  "color": "red"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Unlocked channels",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 3,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "(count(modem_downstream_locked == 0) or vector(0)) + (count(modem_upstream_locked == 0) or vector(0))",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "short",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1.0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "textMode": "auto"
+      },
+      "description": "Downstream and upstream channels reporting unlocked. Should be zero."
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Lowest RxMER",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 6,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "min(modem_downstream_rxmer_db)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "dB",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 33.0
+              }
+            ]
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "textMode": "auto"
+      },
+      "description": "Worst channel right now. Ziggo rates above 33 dB as good, so this going red means at least one channel is struggling."
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Ranging timeouts, 1h",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 9,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum(increase(modem_upstream_ranging_timeouts_total[1h]))",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "short",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1.0
+              },
+              {
+                "color": "red",
+                "value": 10.0
+              }
+            ]
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "textMode": "auto"
+      },
+      "description": "New T1 to T4 timeouts across all upstream channels in the last hour. Anything above zero means the upstream had trouble."
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Uptime",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 12,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "modem_uptime_seconds",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "s",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Mode",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 15,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "modem_bridge_mode",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "1": {
+                  "text": "Bridge",
+                  "color": "blue"
+                },
+                "0": {
+                  "text": "Router",
+                  "color": "purple"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Provisioned down",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 18,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "modem_provisioned_rate_bps{direction=\"downstream\"}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "bps",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "textMode": "auto"
+      },
+      "description": "Maximum rate the CMTS has provisioned."
+    },
+    {
+      "id": 9,
+      "type": "stat",
+      "title": "Provisioned up",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 21,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "modem_provisioned_rate_bps{direction=\"upstream\"}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "bps",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 10,
+      "type": "table",
+      "title": "Device",
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "modem_info",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": false,
+            "cellOptions": {
+              "type": "auto"
+            }
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "__name__": true,
+              "instance": true,
+              "job": true
+            },
+            "renameByName": {
+              "model": "Model",
+              "software_version": "Firmware",
+              "docsis_version": "DOCSIS",
+              "status": "Status"
+            },
+            "indexByName": {
+              "model": 0,
+              "software_version": 1,
+              "docsis_version": 2,
+              "status": 3
+            }
+          }
+        }
+      ],
+      "description": "Firmware appears once modem.py has run with MODEM_PASSWORD set, which is what fills firmware.log."
+    },
+    {
+      "id": 11,
+      "type": "row",
+      "title": "Downstream",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "panels": []
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Downstream power, across all channels",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 10
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "min(modem_downstream_power_dbmv)",
+          "legendFormat": "min",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "avg(modem_downstream_power_dbmv)",
+          "legendFormat": "avg",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "max(modem_downstream_power_dbmv)",
+          "legendFormat": "max",
+          "refId": "C"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "lineInterpolation": "linear",
+            "stacking": {
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            },
+            "axisLabel": "dBmV",
+            "axisSoftMin": -12,
+            "axisSoftMax": 12
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": -11.0
+              },
+              {
+                "color": "green",
+                "value": -7.0
+              },
+              {
+                "color": "yellow",
+                "value": 7.0
+              },
+              {
+                "color": "red",
+                "value": 11.0
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "avg"
+            },
+            "properties": [
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        }
+      },
+      "description": "Ziggo rates -7 to +7 dBmV as good, out to +/-11 tolerated. The dashed lines mark those bands. Per-channel values are in the table below."
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "Downstream RxMER, across all channels",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 10
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "min(modem_downstream_rxmer_db)",
+          "legendFormat": "min",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "avg(modem_downstream_rxmer_db)",
+          "legendFormat": "avg",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "max(modem_downstream_rxmer_db)",
+          "legendFormat": "max",
+          "refId": "C"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "lineInterpolation": "linear",
+            "stacking": {
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            },
+            "axisLabel": "dB",
+            "axisSoftMin": 28,
+            "axisSoftMax": 45
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 33.0
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "avg"
+            },
+            "properties": [
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        }
+      },
+      "description": "Ziggo rates above 33 dB as good. SNR tracks RxMER closely on this modem and is in the table below."
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "FEC corrected",
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (channel_type) (rate(modem_downstream_corrected_errors_total[5m]))",
+          "legendFormat": "{{channel_type}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "lineInterpolation": "linear",
+            "stacking": {
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisLabel": "codewords / s"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        }
+      },
+      "description": "Codewords FEC repaired. Normal, and much higher on OFDM because it carries far more codewords."
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "FEC uncorrected",
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 18
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (channel_type) (rate(modem_downstream_uncorrected_errors_total[5m]))",
+          "legendFormat": "{{channel_type}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "lineInterpolation": "linear",
+            "stacking": {
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisLabel": "codewords / s",
+            "axisSoftMin": 0,
+            "axisSoftMax": 1
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.01
+              },
+              {
+                "color": "red",
+                "value": 1.0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        }
+      },
+      "description": "Codewords FEC could not repair, which is real packet loss. On its own scale because corrected dwarfs it."
+    },
+    {
+      "id": 16,
+      "type": "table",
+      "title": "Downstream channels",
+      "gridPos": {
+        "h": 17,
+        "w": 24,
+        "x": 0,
+        "y": 25
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (channel_id, channel_type) (modem_downstream_power_dbmv)",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (channel_id) (modem_downstream_snr_db)",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (channel_id) (modem_downstream_rxmer_db)",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (channel_id) (rate(modem_downstream_corrected_errors_total[5m]))",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (channel_id) (rate(modem_downstream_uncorrected_errors_total[5m]))",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (channel_id) (modem_downstream_locked)",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "refId": "F"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": false,
+            "cellOptions": {
+              "type": "auto"
+            }
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Power dBmV"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": -11.0
+                    },
+                    {
+                      "color": "green",
+                      "value": -7.0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 7.0
+                    },
+                    {
+                      "color": "red",
+                      "value": 11.0
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "SNR dB"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "green",
+                      "value": 33.0
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RxMER dB"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "green",
+                      "value": 33.0
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Uncorrected /s"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.01
+                    },
+                    {
+                      "color": "red",
+                      "value": 1.0
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Corrected /s"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Locked"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "1": {
+                        "text": "yes",
+                        "color": "green"
+                      },
+                      "0": {
+                        "text": "NO",
+                        "color": "red"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      },
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "channel_id",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "channel_id",
+                "destinationType": "number"
+              }
+            ]
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "channel_id",
+                "desc": false
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true,
+              "Time 4": true,
+              "Time 5": true
+            },
+            "renameByName": {
+              "channel_id": "Channel",
+              "channel_type": "Type",
+              "Value #A": "Power dBmV",
+              "Value #B": "SNR dB",
+              "Value #C": "RxMER dB",
+              "Value #D": "Corrected /s",
+              "Value #E": "Uncorrected /s",
+              "Value #F": "Locked"
+            },
+            "indexByName": {}
+          }
+        }
+      ],
+      "description": "Every downstream channel with its current values, coloured against Ziggo's ranges. This is where you find which channel the summary charts are complaining about."
+    },
+    {
+      "id": 17,
+      "type": "row",
+      "title": "Upstream",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 42
+      },
+      "panels": []
+    },
+    {
+      "id": 18,
+      "type": "timeseries",
+      "title": "Upstream power, ATDMA",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 43
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "modem_upstream_power_dbmv{channel_type=\"atdma\"}",
+          "legendFormat": "ch {{channel_id}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "lineInterpolation": "linear",
+            "stacking": {
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            },
+            "axisLabel": "dBmV",
+            "axisSoftMin": 33,
+            "axisSoftMax": 52
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 35.0
+              },
+              {
+                "color": "yellow",
+                "value": 49.0
+              },
+              {
+                "color": "red",
+                "value": 51.0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        }
+      },
+      "description": "Ziggo rates 35 to 49 dBmV as good, up to 51 tolerated."
+    },
+    {
+      "id": 19,
+      "type": "timeseries",
+      "title": "Upstream power, OFDMA",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 43
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "modem_upstream_power_dbmv{channel_type=\"ofdma\"}",
+          "legendFormat": "ch {{channel_id}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "lineInterpolation": "linear",
+            "stacking": {
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            },
+            "axisLabel": "dBmV",
+            "axisSoftMin": 28,
+            "axisSoftMax": 48
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 28.0
+              },
+              {
+                "color": "green",
+                "value": 30.0
+              },
+              {
+                "color": "yellow",
+                "value": 45.0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        }
+      },
+      "description": "Ziggo rates 30 to 45 dBmV as good. OFDMA sits lower than ATDMA on purpose, because it is measured across a wider block of spectrum. That is normal and not a fault."
+    },
+    {
+      "id": 20,
+      "type": "timeseries",
+      "title": "Ranging timeouts",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 43
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (timer) (increase(modem_upstream_ranging_timeouts_total[5m]))",
+          "legendFormat": "{{timer}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "custom": {
+            "drawStyle": "bars",
+            "lineWidth": 1,
+            "fillOpacity": 60,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "lineInterpolation": "linear",
+            "stacking": {
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0,
+            "axisSoftMax": 2
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        }
+      },
+      "description": "New DOCSIS ranging timeouts per interval. T3 bursts mean the upstream is struggling, T4 is worse."
+    },
+    {
+      "id": 21,
+      "type": "table",
+      "title": "Upstream channels",
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 51
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (channel_id, channel_type) (modem_upstream_power_dbmv)",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (channel_id, modulation) (modem_channel_modulation_info{direction=\"upstream\"})",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (channel_id) (modem_upstream_frequency_hz)",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (channel_id) (modem_upstream_channel_width_hz)",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (channel_id) (modem_upstream_ranging_timeouts_total{timer=\"t3\"})",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (channel_id) (modem_upstream_ranging_timeouts_total{timer=\"t4\"})",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (channel_id) (modem_upstream_locked)",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "refId": "G"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": false,
+            "cellOptions": {
+              "type": "auto"
+            }
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Power dBmV"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Frequency"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "hertz"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Channel width"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "hertz"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "T3 timeouts"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 1.0
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "T4 timeouts"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "red",
+                      "value": 1.0
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Locked"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "1": {
+                        "text": "yes",
+                        "color": "green"
+                      },
+                      "0": {
+                        "text": "NO",
+                        "color": "red"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      },
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "channel_id",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "channel_id",
+                "destinationType": "number"
+              }
+            ]
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "channel_id",
+                "desc": false
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true,
+              "Time 4": true,
+              "Time 5": true,
+              "Time 6": true,
+              "Value #B": true
+            },
+            "renameByName": {
+              "channel_id": "Channel",
+              "channel_type": "Type",
+              "modulation": "Modulation",
+              "Value #A": "Power dBmV",
+              "Value #C": "Frequency",
+              "Value #D": "Channel width",
+              "Value #E": "T3 timeouts",
+              "Value #F": "T4 timeouts",
+              "Value #G": "Locked"
+            },
+            "indexByName": {}
+          }
+        }
+      ],
+      "description": "Every upstream channel. ATDMA reports a centre frequency and OFDMA a channel width, so each type fills one of those two columns. T3 and T4 are totals since the modem last booted, not a rate. Power is not coloured here because the good range differs by channel type, which the two charts above handle."
+    },
+    {
+      "id": 22,
+      "type": "row",
+      "title": "Event log and exporter health",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 61
+      },
+      "panels": []
+    },
+    {
+      "id": 23,
+      "type": "timeseries",
+      "title": "Event log entries by priority",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 62
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "modem_event_log_entries",
+          "legendFormat": "{{priority}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "lineInterpolation": "stepAfter",
+            "stacking": {
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0,
+            "axisSoftMax": 5
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        }
+      },
+      "description": "Entries currently in the modem's rolling log window. These are gauges, not counters, so no rate() on them."
+    },
+    {
+      "id": 24,
+      "type": "timeseries",
+      "title": "Parsed log events in window",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 62
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "modem_log_events_in_window",
+          "legendFormat": "{{type}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "lineInterpolation": "stepAfter",
+            "stacking": {
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0,
+            "axisSoftMax": 5
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        }
+      }
+    },
+    {
+      "id": 25,
+      "type": "timeseries",
+      "title": "CM-STATUS events in window",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 62
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "modem_cm_status_events_in_window",
+          "legendFormat": "code {{event_code}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "lineInterpolation": "stepAfter",
+            "stacking": {
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0,
+            "axisSoftMax": 5
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        }
+      },
+      "description": "4 MDD recovery, 20 NCP profile failure, 21 PLC failure, 22 NCP profile recovery."
+    },
+    {
+      "id": 26,
+      "type": "table",
+      "title": "Current channel profiles",
+      "gridPos": {
+        "h": 7,
+        "w": 10,
+        "x": 0,
+        "y": 70
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "modem_channel_profile_info",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": false,
+            "cellOptions": {
+              "type": "auto"
+            }
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "__name__": true,
+              "instance": true,
+              "job": true
+            },
+            "renameByName": {
+              "direction": "Direction",
+              "channel_id": "Channel",
+              "profile": "Profile"
+            },
+            "indexByName": {
+              "direction": 0,
+              "channel_id": 1,
+              "profile": 2
+            }
+          }
+        }
+      ],
+      "description": "Most recent profile the CMTS assigned per channel, read from the event log."
+    },
+    {
+      "id": 27,
+      "type": "timeseries",
+      "title": "Modem poll duration",
+      "gridPos": {
+        "h": 7,
+        "w": 10,
+        "x": 10,
+        "y": 70
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "modem_scrape_duration_seconds",
+          "legendFormat": "poll",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "s",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "lineInterpolation": "linear",
+            "stacking": {
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0,
+            "axisSoftMax": 10
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        }
+      },
+      "description": "How long the exporter needs to read every endpoint. This happens on a background thread, so Prometheus scrapes stay instant regardless."
+    },
+    {
+      "id": 28,
+      "type": "stat",
+      "title": "Last poll age",
+      "gridPos": {
+        "h": 7,
+        "w": 4,
+        "x": 20,
+        "y": 70
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "time() - modem_last_poll_timestamp_seconds",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "s",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 120.0
+              }
+            ]
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "textMode": "auto"
+      },
+      "description": "Time since the exporter last reached the modem. Alert on this going stale."
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 39,
+  "tags": [
+    "docsis",
+    "modem",
+    "f3896lg"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Sagemcom F3896LG",
+  "uid": "f3896lg-ziggo",
+  "version": 1,
+  "weekStart": ""
+}

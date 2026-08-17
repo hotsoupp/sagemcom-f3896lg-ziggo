@@ -1,0 +1,15 @@
+# Local runtime state, not source
+stats.json
+firmware.log
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Editor and OS
+.vscode/
+.idea/
+*.swp
+.DS_Store

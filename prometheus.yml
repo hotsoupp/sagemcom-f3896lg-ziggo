@@ -1,0 +1,12 @@
+# Minimal Prometheus config for the modem exporter.
+#
+# Grafana never talks to the exporter. It queries Prometheus, and Prometheus
+# scrapes the exporter. So the data source URL in Grafana is this server on
+# port 9090, not the exporter on 9105.
+global:
+  scrape_interval: 30s
+
+scrape_configs:
+  - job_name: modem
+    static_configs:
+      - targets: ['localhost:9105']

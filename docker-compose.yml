@@ -1,0 +1,38 @@
+# Minimal compose file for the exporter. Adjust MODEM_HOST if your modem is not
+# on the default 192.168.100.1. Nothing else is required.
+services:
+  modem-exporter:
+    build: .
+    image: sagemcom-f3896lg-ziggo
+    restart: unless-stopped
+    # Publish to localhost only. Point Prometheus at host.docker.internal or the
+    # host IP, or scrape from another container on the same network instead.
+    ports:
+      - "127.0.0.1:9105:9105"
+    environment:
+      MODEM_HOST: "https://192.168.100.1"
+      MODEM_INTERVAL: "30"
+    # Optional, only for the firmware version (see the README). Create the
+    # file by running modem.py once with MODEM_PASSWORD set, then uncomment.
+    # volumes:
+    #   - ./firmware.log:/app/firmware.log:ro,z
+
+  # Optional. Grafana cannot read the exporter directly, it queries Prometheus
+  # and Prometheus scrapes the exporter. Start this one with
+  #   docker compose --profile prometheus up -d
+  # and point Grafana at http://localhost:9090.
+  prometheus:
+    profiles: ["prometheus"]
+    image: prom/prometheus
+    restart: unless-stopped
+    # Host networking so the scrape target stays localhost:9105 whether the
+    # exporter runs as a container or as a plain python process. Linux only.
+    network_mode: host
+    volumes:
+      # The z flag relabels the file for SELinux systems like Fedora, where the
+      # container is otherwise denied access. It is ignored elsewhere.
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro,z
+      - prometheus-data:/prometheus
+
+volumes:
+  prometheus-data:
