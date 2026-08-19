@@ -16,7 +16,10 @@ version sits behind the login, and even that is optional (see
 
 <p>
   <img src="docs/images/ziggo-logo.png" alt="Ziggo" height="36">&emsp;
-  <img src="docs/images/hn-logo.svg" alt="Hollandsnieuwe" height="36">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/hn-logo.svg">
+    <img src="docs/images/hn-logo-light.svg" alt="Hollandsnieuwe" height="36">
+  </picture>
 </p>
 
 <sub>Hobby project, no ties to VodafoneZiggo or Hollandsnieuwe. The logos and the
