@@ -46,6 +46,10 @@ BIND = os.environ.get("MODEM_EXPORTER_BIND", "127.0.0.1")
 # free. Measured medians for a full poll, about 0.2s when polling every 5s,
 # 3.9s every 10s, 5.4s every 20s, 9s every 30s. The modem does the same work
 # either way, a shorter interval just means more polls land on the cached path.
+# Haven't gotten a clean median at 60s, the default here, yet. A rough check
+# came back well under the 30s figure, but that run followed a lot of other
+# polling against the same modem in the same session, so it is not trustworthy
+# enough to quote.
 #
 # A couple things that didn't help, both measured. Fetching the endpoints
 # concurrently was no better at a 30s cadence and threw a 28s outlier, since
@@ -53,7 +57,7 @@ BIND = os.environ.get("MODEM_EXPORTER_BIND", "127.0.0.1")
 # didn't help either, TLS is 50ms either way. So we poll on a background
 # thread and let /metrics serve the last snapshot instantly, which keeps
 # scrapes fast no matter how slow a poll runs.
-INTERVAL = float(os.environ.get("MODEM_INTERVAL", "30"))
+INTERVAL = float(os.environ.get("MODEM_INTERVAL", "60"))
 
 # Event log message shapes. The upstream/downstream profile and reboot
 # patterns follow ties/sagemcom-f3896-py. CM-STATUS is deliberately more
