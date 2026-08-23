@@ -418,9 +418,9 @@ panels = [
                     "instant regardless."),
     stat("Last poll age", {"h": 7, "w": 4, "x": 20, "y": 70},
          targets(target("time() - modem_last_poll_timestamp_seconds")),
-         unit="s", decimals=0, tsteps=[("green", None), ("red", 120.0)],
-         desc="Time since the exporter last reached the modem. Alert on this "
-              "going stale."),
+         unit="s", decimals=0, tsteps=[("green", None), ("red", 240.0)],
+         desc="Time since the last poll attempt, updates even if the modem "
+              "was unreachable. Alert on this going stale, see alerts.yml."),
 ]
 
 dashboard = {

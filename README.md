@@ -147,9 +147,29 @@ so scrapes return instantly.
 | `MODEM_HOST`           | `https://192.168.100.1` | Modem address               |
 | `MODEM_EXPORTER_PORT`  | `9105`                  | Port to listen on           |
 | `MODEM_EXPORTER_BIND`  | `127.0.0.1`             | Interface to bind           |
-| `MODEM_INTERVAL`       | `30`                    | Seconds between modem polls |
+| `MODEM_INTERVAL`       | `60`                    | Seconds between modem polls |
 
-To run it as a service, edit the paths in `systemd/modem-exporter.service`, then:
+To run it as a service, first create the account it runs as. It only needs
+read access to wherever you cloned the repo, nothing else, so grant that
+without changing ownership. That way whoever set up the venv above, or runs
+the occasional firmware.log update below, keeps owning their own files.
+
+```
+sudo useradd --system --no-create-home --shell /usr/sbin/nologin modem-exporter
+sudo chmod -R o+rX /opt/sagemcom-f3896lg-ziggo
+```
+
+That chmod does not apply retroactively, run it again after a `git pull` or
+after adding files the service needs to read.
+
+The unit's `ProtectSystem=strict` makes the whole filesystem read-only to the
+service, including that directory. That is fine, the exporter never writes
+anything, it only reads `firmware.log`. The sample unit's `ExecStart` assumes
+the venv from the [Python](#python) section above, at `.venv`. If you
+installed the dependencies system-wide instead, change it to plain
+`python3 /opt/sagemcom-f3896lg-ziggo/exporter.py`. Either way, edit the paths
+in `systemd/modem-exporter.service` if you cloned somewhere other than
+`/opt/sagemcom-f3896lg-ziggo`.
 
 ```
 sudo cp systemd/modem-exporter.service /etc/systemd/system/
@@ -184,10 +204,15 @@ and `docker compose --profile prometheus up -d` runs one alongside.
 ```yaml
 scrape_configs:
   - job_name: modem
-    scrape_interval: 30s
+    scrape_interval: 60s
     static_configs:
       - targets: ['localhost:9105']
 ```
+
+There's also an `alerts.yml` with a handful of example rules, modem
+unreachable, uncorrectable errors climbing, the exporter itself stalled.
+Point Prometheus at it with `rule_files: [alerts.yml]` if you want them, they
+are not wired to an Alertmanager by this repo, that part is on you.
 
 Then in Grafana, Dashboards, Import, upload `grafana-dashboard.json` and pick
 your Prometheus as the data source.
@@ -217,6 +242,23 @@ The exporter only ever reads that file, it never logs in itself, so setting
 `MODEM_PASSWORD` on the exporter does nothing. In Docker the file isn't in the
 image either, so mount it if you want the version in there. `docker-compose.yml`
 has the line ready to uncomment.
+
+To keep the version current without remembering to run it yourself, put it on
+a timer instead. A cron entry works, keep the password out of the crontab
+itself:
+
+```
+# /etc/modem-exporter.env, mode 600, owned by whoever runs the cron job
+MODEM_PASSWORD=your-password
+```
+
+```
+# crontab -e
+0 6 * * * . /etc/modem-exporter.env; MODEM_PASSWORD="$MODEM_PASSWORD" /opt/sagemcom-f3896lg-ziggo/.venv/bin/python3 /opt/sagemcom-f3896lg-ziggo/modem.py
+```
+
+This is a separate, occasional job, not part of the always-on exporter
+service, so it is not in `systemd/modem-exporter.service`.
 
 ## Metrics
 

@@ -4,7 +4,13 @@
 # scrapes the exporter. So the data source URL in Grafana is this server on
 # port 9090, not the exporter on 9105.
 global:
-  scrape_interval: 30s
+  scrape_interval: 60s
+
+# Example alerting rules, see alerts.yml. Not wired to an Alertmanager here,
+# that's a separate piece, this just gets the rules evaluating so they show
+# up in Prometheus's own UI.
+rule_files:
+  - alerts.yml
 
 scrape_configs:
   - job_name: modem

@@ -1,0 +1,44 @@
+# Example alerting rules for the modem exporter. Loaded by prometheus.yml.
+# Thresholds assume the default MODEM_INTERVAL of 60s, adjust the "for" and
+# the 180s constant below if you poll on a different cadence.
+groups:
+  - name: modem
+    rules:
+      - alert: ModemUnreachable
+        expr: modem_up == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Exporter can't reach the cable modem"
+          description: "modem_up has been 0 for 5 minutes on {{ $labels.instance }}."
+
+      - alert: ModemUncorrectableErrors
+        # Summed across channels, so one noisy channel among many healthy ones
+        # still fires. Good enough to know something is wrong, the Grafana
+        # dashboard's per-channel table is where you find which one.
+        expr: sum(rate(modem_downstream_uncorrected_errors_total[5m])) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Modem is accumulating uncorrectable FEC errors"
+          description: "{{ $value | printf \"%.3f\" }} uncorrected codewords/s over the last 5m."
+
+      - alert: ModemExporterStalled
+        expr: (time() - modem_last_poll_timestamp_seconds) > 180
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "modem-exporter poll loop stopped advancing"
+          description: "Last poll attempt was over 180s ago. modem_last_poll_timestamp_seconds updates even when the modem is unreachable, so this means the poller thread itself is stuck, not just a slow modem."
+
+      - alert: ModemExporterTargetMissing
+        expr: absent(modem_last_poll_timestamp_seconds)
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "modem-exporter target isn't reporting at all"
+          description: "No modem_last_poll_timestamp_seconds series. The process is down, or Prometheus lost the target, either way the other rules here have nothing to evaluate."

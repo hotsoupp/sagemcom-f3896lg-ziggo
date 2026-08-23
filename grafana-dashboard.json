@@ -2452,7 +2452,7 @@
               },
               {
                 "color": "red",
-                "value": 120.0
+                "value": 240.0
               }
             ]
           },
@@ -2473,7 +2473,7 @@
         "justifyMode": "auto",
         "textMode": "auto"
       },
-      "description": "Time since the exporter last reached the modem. Alert on this going stale."
+      "description": "Time since the last poll attempt, updates even if the modem was unreachable. Alert on this going stale, see alerts.yml."
     }
   ],
   "refresh": "1m",

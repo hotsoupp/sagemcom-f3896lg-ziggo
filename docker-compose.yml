@@ -11,7 +11,7 @@ services:
       - "127.0.0.1:9105:9105"
     environment:
       MODEM_HOST: "https://192.168.100.1"
-      MODEM_INTERVAL: "30"
+      MODEM_INTERVAL: "60"
     # Optional, only for the firmware version (see the README). Create the
     # file by running modem.py once with MODEM_PASSWORD set, then uncomment.
     # volumes:
@@ -32,6 +32,7 @@ services:
       # The z flag relabels the file for SELinux systems like Fedora, where the
       # container is otherwise denied access. It is ignored elsewhere.
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro,z
+      - ./alerts.yml:/etc/prometheus/alerts.yml:ro,z
       - prometheus-data:/prometheus
 
 volumes:

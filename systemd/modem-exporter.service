@@ -1,22 +1,31 @@
-# Runs the Prometheus exporter on boot. Copy this file to
-# /etc/systemd/system/modem-exporter.service, edit the paths and User below,
-# then run sudo systemctl daemon-reload && sudo systemctl enable --now modem-exporter
+# Runs the Prometheus exporter on boot. Create the service account first
+# (see README), copy this file to /etc/systemd/system/modem-exporter.service,
+# edit the paths below to match where you cloned the repo, then run
+# sudo systemctl daemon-reload && sudo systemctl enable --now modem-exporter
 [Unit]
 Description=Sagemcom F3896LG (Ziggo) modem Prometheus exporter
 After=network-online.target
 Wants=network-online.target
 
 [Service]
-# Adjust these three to match where you cloned the repo and which user runs it.
-User=youruser
+# Dedicated, unprivileged account. Create it before the first start, see the
+# README, it needs nothing but read access to WorkingDirectory.
+User=modem-exporter
+Group=modem-exporter
 WorkingDirectory=/opt/sagemcom-f3896lg-ziggo
-ExecStart=/usr/bin/python3 /opt/sagemcom-f3896lg-ziggo/exporter.py
+# Points at the venv's interpreter, not the system one, so the dependencies
+# from requirements.txt are actually on the path. Adjust if you installed
+# them system-wide instead.
+ExecStart=/opt/sagemcom-f3896lg-ziggo/.venv/bin/python3 /opt/sagemcom-f3896lg-ziggo/exporter.py
 Environment=MODEM_HOST=https://192.168.100.1
-Environment=MODEM_INTERVAL=30
+Environment=MODEM_INTERVAL=60
 Restart=always
 RestartSec=10
 
 NoNewPrivileges=true
+# Makes the whole filesystem, including WorkingDirectory, read-only except
+# for /dev, /proc, /sys. Fine here since the exporter never writes anything,
+# it only reads firmware.log. If that ever changes, add ReadWritePaths=.
 ProtectSystem=strict
 ProtectHome=true
 PrivateTmp=true
