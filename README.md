@@ -140,7 +140,8 @@ python3 exporter.py
 ```
 
 Listens on http://127.0.0.1:9105/metrics and polls the modem in the background,
-so scrapes return instantly.
+so scrapes return instantly. `/healthz` only confirms that the exporter is
+running. Use `modem_up` to check modem access.
 
 | Variable               | Default                 | Meaning                     |
 |------------------------|-------------------------|-----------------------------|
@@ -148,6 +149,13 @@ so scrapes return instantly.
 | `MODEM_EXPORTER_PORT`  | `9105`                  | Port to listen on           |
 | `MODEM_EXPORTER_BIND`  | `127.0.0.1`             | Interface to bind           |
 | `MODEM_INTERVAL`       | `60`                    | Seconds between modem polls |
+| `MODEM_REQUEST_TIMEOUT` | `10`                   | Seconds allowed per request |
+| `MODEM_REQUEST_RETRIES` | `3`                    | Attempts per request        |
+| `MODEM_REQUEST_BACKOFF` | `1`                    | Initial retry backoff in seconds |
+
+Retry backoff doubles for each retry and is capped at 4 seconds. A slow
+endpoint can exceed `MODEM_INTERVAL`. The next poll starts once the current
+poll finishes.
 
 To run it as a service, first create the account it runs as. It only needs
 read access to wherever you cloned the repo, nothing else, so grant that
@@ -209,8 +217,9 @@ scrape_configs:
       - targets: ['localhost:9105']
 ```
 
-There's also an `alerts.yml` with a handful of example rules, modem
-unreachable, uncorrectable errors climbing, the exporter itself stalled.
+There's also an `alerts.yml` with example rules for modem reachability,
+uncorrectable errors, lost channel lock, T3/T4 ranging timeouts, optional
+endpoint failures and a stalled exporter.
 Point Prometheus at it with `rule_files: [alerts.yml]` if you want them, they
 are not wired to an Alertmanager by this repo, that part is on you.
 

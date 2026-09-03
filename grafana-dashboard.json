@@ -97,6 +97,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "modem_up",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "refId": "A"
         }
       ],
@@ -168,6 +171,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "(count(modem_downstream_locked == 0) or vector(0)) + (count(modem_upstream_locked == 0) or vector(0))",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "refId": "A"
         }
       ],
@@ -230,6 +236,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "min(modem_downstream_rxmer_db)",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "refId": "A"
         }
       ],
@@ -292,7 +301,10 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "sum(increase(modem_upstream_ranging_timeouts_total[1h]))",
+          "expr": "sum(increase(modem_upstream_ranging_timeouts_total{timer=~\"t3|t4\"}[1h]))",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "refId": "A"
         }
       ],
@@ -337,7 +349,7 @@
         "justifyMode": "auto",
         "textMode": "auto"
       },
-      "description": "New T1 to T4 timeouts across all upstream channels in the last hour. Anything above zero means the upstream had trouble."
+      "description": "New T3 and T4 timeouts across all upstream channels in the last hour. Anything above zero means the upstream had trouble."
     },
     {
       "id": 6,
@@ -360,6 +372,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "modem_uptime_seconds",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "refId": "A"
         }
       ],
@@ -417,6 +432,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "modem_bridge_mode",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "refId": "A"
         }
       ],
@@ -488,6 +506,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "modem_provisioned_rate_bps{direction=\"downstream\"}",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "refId": "A"
         }
       ],
@@ -546,6 +567,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "modem_provisioned_rate_bps{direction=\"upstream\"}",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "refId": "A"
         }
       ],
@@ -603,9 +627,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "modem_info",
+          "format": "table",
           "instant": true,
           "range": false,
-          "format": "table",
           "refId": "A"
         }
       ],
@@ -640,6 +664,10 @@
         }
       },
       "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
         {
           "id": "organize",
           "options": {
@@ -701,6 +729,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "min(modem_downstream_power_dbmv)",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "legendFormat": "min",
           "refId": "A"
         },
@@ -710,6 +741,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "avg(modem_downstream_power_dbmv)",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "legendFormat": "avg",
           "refId": "B"
         },
@@ -719,6 +753,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "max(modem_downstream_power_dbmv)",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "legendFormat": "max",
           "refId": "C"
         }
@@ -823,6 +860,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "min(modem_downstream_rxmer_db)",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "legendFormat": "min",
           "refId": "A"
         },
@@ -832,6 +872,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "avg(modem_downstream_rxmer_db)",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "legendFormat": "avg",
           "refId": "B"
         },
@@ -841,6 +884,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "max(modem_downstream_rxmer_db)",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "legendFormat": "max",
           "refId": "C"
         }
@@ -933,6 +979,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (channel_type) (rate(modem_downstream_corrected_errors_total[5m]))",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "legendFormat": "{{channel_type}}",
           "refId": "A"
         }
@@ -1006,6 +1055,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (channel_type) (rate(modem_downstream_uncorrected_errors_total[5m]))",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "legendFormat": "{{channel_type}}",
           "refId": "A"
         }
@@ -1089,9 +1141,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (channel_id, channel_type) (modem_downstream_power_dbmv)",
+          "format": "table",
           "instant": true,
           "range": false,
-          "format": "table",
           "refId": "A"
         },
         {
@@ -1100,9 +1152,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (channel_id) (modem_downstream_snr_db)",
+          "format": "table",
           "instant": true,
           "range": false,
-          "format": "table",
           "refId": "B"
         },
         {
@@ -1111,9 +1163,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (channel_id) (modem_downstream_rxmer_db)",
+          "format": "table",
           "instant": true,
           "range": false,
-          "format": "table",
           "refId": "C"
         },
         {
@@ -1122,9 +1174,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (channel_id) (rate(modem_downstream_corrected_errors_total[5m]))",
+          "format": "table",
           "instant": true,
           "range": false,
-          "format": "table",
           "refId": "D"
         },
         {
@@ -1133,9 +1185,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (channel_id) (rate(modem_downstream_uncorrected_errors_total[5m]))",
+          "format": "table",
           "instant": true,
           "range": false,
-          "format": "table",
           "refId": "E"
         },
         {
@@ -1144,9 +1196,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (channel_id) (modem_downstream_locked)",
+          "format": "table",
           "instant": true,
           "range": false,
-          "format": "table",
           "refId": "F"
         }
       ],
@@ -1379,6 +1431,10 @@
       },
       "transformations": [
         {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
           "id": "joinByField",
           "options": {
             "byField": "channel_id",
@@ -1468,6 +1524,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "modem_upstream_power_dbmv{channel_type=\"atdma\"}",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "legendFormat": "ch {{channel_id}}",
           "refId": "A"
         }
@@ -1555,6 +1614,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "modem_upstream_power_dbmv{channel_type=\"ofdma\"}",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "legendFormat": "ch {{channel_id}}",
           "refId": "A"
         }
@@ -1642,6 +1704,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (timer) (increase(modem_upstream_ranging_timeouts_total[5m]))",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "legendFormat": "{{timer}}",
           "refId": "A"
         }
@@ -1716,9 +1781,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (channel_id, channel_type) (modem_upstream_power_dbmv)",
+          "format": "table",
           "instant": true,
           "range": false,
-          "format": "table",
           "refId": "A"
         },
         {
@@ -1727,9 +1792,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (channel_id, modulation) (modem_channel_modulation_info{direction=\"upstream\"})",
+          "format": "table",
           "instant": true,
           "range": false,
-          "format": "table",
           "refId": "B"
         },
         {
@@ -1738,9 +1803,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (channel_id) (modem_upstream_frequency_hz)",
+          "format": "table",
           "instant": true,
           "range": false,
-          "format": "table",
           "refId": "C"
         },
         {
@@ -1749,9 +1814,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (channel_id) (modem_upstream_channel_width_hz)",
+          "format": "table",
           "instant": true,
           "range": false,
-          "format": "table",
           "refId": "D"
         },
         {
@@ -1760,9 +1825,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (channel_id) (modem_upstream_ranging_timeouts_total{timer=\"t3\"})",
+          "format": "table",
           "instant": true,
           "range": false,
-          "format": "table",
           "refId": "E"
         },
         {
@@ -1771,9 +1836,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (channel_id) (modem_upstream_ranging_timeouts_total{timer=\"t4\"})",
+          "format": "table",
           "instant": true,
           "range": false,
-          "format": "table",
           "refId": "F"
         },
         {
@@ -1782,9 +1847,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum by (channel_id) (modem_upstream_locked)",
+          "format": "table",
           "instant": true,
           "range": false,
-          "format": "table",
           "refId": "G"
         }
       ],
@@ -1963,6 +2028,10 @@
       },
       "transformations": [
         {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
           "id": "joinByField",
           "options": {
             "byField": "channel_id",
@@ -2055,6 +2124,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "modem_event_log_entries",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "legendFormat": "{{priority}}",
           "refId": "A"
         }
@@ -2129,6 +2201,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "modem_log_events_in_window",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "legendFormat": "{{type}}",
           "refId": "A"
         }
@@ -2202,6 +2277,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "modem_cm_status_events_in_window",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "legendFormat": "code {{event_code}}",
           "refId": "A"
         }
@@ -2276,9 +2354,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "modem_channel_profile_info",
+          "format": "table",
           "instant": true,
           "range": false,
-          "format": "table",
           "refId": "A"
         }
       ],
@@ -2313,6 +2391,10 @@
         }
       },
       "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
         {
           "id": "organize",
           "options": {
@@ -2359,6 +2441,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "modem_scrape_duration_seconds",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "legendFormat": "poll",
           "refId": "A"
         }
@@ -2433,6 +2518,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "time() - modem_last_poll_timestamp_seconds",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "refId": "A"
         }
       ],

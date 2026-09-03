@@ -50,6 +50,16 @@ MAC_RE = re.compile(r"\b[0-9a-fA-F]{2}(?::[0-9a-fA-F]{2}){5}\b")
 # give up. Never evict whoever's actually logged in, see login() below.
 LOGIN_RETRIES = 2
 LOGIN_BACKOFF = 3
+REQUEST_TIMEOUT = float(os.environ.get("MODEM_REQUEST_TIMEOUT", "10"))
+REQUEST_RETRIES = int(os.environ.get("MODEM_REQUEST_RETRIES", "3"))
+REQUEST_BACKOFF = float(os.environ.get("MODEM_REQUEST_BACKOFF", "1"))
+
+if REQUEST_TIMEOUT <= 0:
+    raise ValueError("MODEM_REQUEST_TIMEOUT must be greater than zero")
+if REQUEST_RETRIES < 1:
+    raise ValueError("MODEM_REQUEST_RETRIES must be at least one")
+if REQUEST_BACKOFF < 0:
+    raise ValueError("MODEM_REQUEST_BACKOFF must not be negative")
 
 # Ziggo's published good/tolerated signal values, same ones the Grafana
 # dashboard draws as threshold lines. Downstream rated by distance from 0,
@@ -94,28 +104,35 @@ def mhz(value):
     return None if value is None else round(value / 1e6, 1)
 
 
-def get(path, headers=None, attempts=3):
-    """GET with a couple of retries, since this modem drops requests sometimes."""
+def get(path, headers=None, attempts=REQUEST_RETRIES):
+    """GET with retries and capped exponential backoff."""
     last = None
-    for _ in range(attempts):
+    for attempt in range(attempts):
         try:
-            r = _session.get(f"{HOST}{path}", headers=headers, timeout=10)
+            r = _session.get(f"{HOST}{path}", headers=headers, timeout=REQUEST_TIMEOUT)
             r.raise_for_status()
             return r.json()
-        except Exception as exc:
+        except (requests.RequestException, ValueError) as exc:
             last = exc
+            if attempt < attempts - 1:
+                time.sleep(REQUEST_BACKOFF * min(2 ** attempt, 4))
     raise last
 
 
-def get_optional(path, key, default):
+def get_optional(path, key, default, endpoint_status=None, endpoint=None):
     """GET for the endpoints the tools can live without."""
     try:
-        return get(path).get(key) or default
-    except Exception:
+        result = get(path).get(key) or default
+    except (requests.RequestException, ValueError):
+        if endpoint_status is not None:
+            endpoint_status[endpoint or path] = 0
         return default
+    if endpoint_status is not None:
+        endpoint_status[endpoint or path] = 1
+    return result
 
 
-def fetch_snapshot():
+def fetch_snapshot(endpoint_status=None):
     """Fetch and normalise everything both the summary and the exporter read.
 
     Downstream and upstream are required and raise if unreachable. Modem state
@@ -124,10 +141,26 @@ def fetch_snapshot():
     powerDbmv, rxMerDb and MHz fields added so nothing downstream needs to know
     about the tenths quirk or which channel types skip a frequency.
     """
-    ds = get("/rest/v1/cablemodem/downstream").get("downstream", {}).get("channels", [])
-    us = get("/rest/v1/cablemodem/upstream").get("upstream", {}).get("channels", [])
-    cm = get_optional("/rest/v1/cablemodem/state_", "cablemodem", {})
-    events = get_optional("/rest/v1/cablemodem/eventlog", "eventlog", [])
+    try:
+        ds = get("/rest/v1/cablemodem/downstream").get("downstream", {}).get("channels", [])
+        if endpoint_status is not None:
+            endpoint_status["downstream"] = 1
+    except (requests.RequestException, ValueError):
+        if endpoint_status is not None:
+            endpoint_status["downstream"] = 0
+        raise
+    try:
+        us = get("/rest/v1/cablemodem/upstream").get("upstream", {}).get("channels", [])
+        if endpoint_status is not None:
+            endpoint_status["upstream"] = 1
+    except (requests.RequestException, ValueError):
+        if endpoint_status is not None:
+            endpoint_status["upstream"] = 0
+        raise
+    cm = get_optional("/rest/v1/cablemodem/state_", "cablemodem", {},
+                      endpoint_status, "state")
+    events = get_optional("/rest/v1/cablemodem/eventlog", "eventlog", [],
+                          endpoint_status, "eventlog")
     events = [dict(e, message=MAC_RE.sub("<mac>", e.get("message") or "")) for e in events]
     for ch in ds + us:
         ch["powerDbmv"] = norm_power(ch)
@@ -147,7 +180,7 @@ def login(password, retries):
     """
     for attempt in range(1, retries + 1):
         r = _session.post(f"{HOST}/rest/v1/user/login",
-                          json={"password": password}, timeout=10)
+                          json={"password": password}, timeout=REQUEST_TIMEOUT)
         if r.status_code == 201:
             created = r.json().get("created", {})
             return created.get("token"), created.get("userId")
@@ -182,7 +215,7 @@ def fetch_info(password, retries):
         # release the single-session lock even if the read above failed
         try:
             d = _session.delete(f"{HOST}/rest/v1/user/{user_id}/token/{token}",
-                                headers=headers, timeout=10)
+                                headers=headers, timeout=REQUEST_TIMEOUT)
             if d.status_code != 204:
                 print(f"  note: logout returned {d.status_code}; modem may stay locked briefly")
         except Exception:
