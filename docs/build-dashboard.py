@@ -178,6 +178,10 @@ def organize(exclude=(), rename=None, order=None):
         "indexByName": order or {}}}
 
 
+def labels_to_fields():
+    return {"id": "labelsToFields", "options": {}}
+
+
 def row(title, y):
     return {"id": nid(), "type": "row", "title": title, "collapsed": False,
             "gridPos": {"h": 1, "w": 24, "x": 0, "y": y}, "panels": []}
@@ -224,7 +228,8 @@ panels = [
          unit="bps"),
     table("Device", {"h": 4, "w": 24, "x": 0, "y": 5},
           targets(target("modem_info", instant=True, table=True)),
-          [organize(exclude=["Time", "Value", "__name__", "instance", "job"],
+          [labels_to_fields(),
+           organize(exclude=["Time", "Value", "__name__", "instance", "job"],
                     rename={"model": "Model", "software_version": "Firmware",
                             "docsis_version": "DOCSIS", "status": "Status"},
                     order={"model": 0, "software_version": 1,
@@ -285,6 +290,7 @@ panels = [
               target("sum by (channel_id) (modem_downstream_locked)",
                      instant=True, table=True)),
           [
+              labels_to_fields(),
               {"id": "joinByField",
                "options": {"byField": "channel_id", "mode": "outer"}},
               {"id": "convertFieldType",
@@ -353,6 +359,7 @@ panels = [
               target("sum by (channel_id) (modem_upstream_locked)",
                      instant=True, table=True)),
           [
+              labels_to_fields(),
               {"id": "joinByField",
                "options": {"byField": "channel_id", "mode": "outer"}},
               {"id": "convertFieldType",
@@ -405,7 +412,8 @@ panels = [
                     "22 NCP profile recovery."),
     table("Current channel profiles", {"h": 7, "w": 10, "x": 0, "y": 70},
           targets(target("modem_channel_profile_info", instant=True, table=True)),
-          [organize(exclude=["Time", "Value", "__name__", "instance", "job"],
+          [labels_to_fields(),
+           organize(exclude=["Time", "Value", "__name__", "instance", "job"],
                     rename={"direction": "Direction", "channel_id": "Channel",
                             "profile": "Profile"},
                     order={"direction": 0, "channel_id": 1, "profile": 2})],

@@ -665,6 +665,10 @@
       },
       "transformations": [
         {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
           "id": "organize",
           "options": {
             "excludeByName": {
@@ -1427,6 +1431,10 @@
       },
       "transformations": [
         {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
           "id": "joinByField",
           "options": {
             "byField": "channel_id",
@@ -2020,6 +2028,10 @@
       },
       "transformations": [
         {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
           "id": "joinByField",
           "options": {
             "byField": "channel_id",
@@ -2379,6 +2391,10 @@
         }
       },
       "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
         {
           "id": "organize",
           "options": {
