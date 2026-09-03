@@ -49,14 +49,15 @@ def steps(pairs):
 
 
 def target(expr, legend=None, instant=False, table=False):
-    t = {"datasource": DS, "expr": expr}
+    t = {
+        "datasource": DS,
+        "expr": expr,
+        "format": "table" if table else "time_series",
+        "instant": instant,
+        "range": not instant,
+    }
     if legend:
         t["legendFormat"] = legend
-    if instant:
-        t["instant"] = True
-        t["range"] = False
-    if table:
-        t["format"] = "table"
     return t
 
 
@@ -204,9 +205,9 @@ panels = [
          desc="Worst channel right now. Ziggo rates above 33 dB as good, so "
               "this going red means at least one channel is struggling."),
     stat("Ranging timeouts, 1h", {"h": 4, "w": 3, "x": 9, "y": 1},
-         targets(target("sum(increase(modem_upstream_ranging_timeouts_total[1h]))")),
+         targets(target('sum(increase(modem_upstream_ranging_timeouts_total{timer=~"t3|t4"}[1h]))')),
          decimals=0, tsteps=[("green", None), ("yellow", 1.0), ("red", 10.0)],
-         desc="New T1 to T4 timeouts across all upstream channels in the last "
+         desc="New T3 and T4 timeouts across all upstream channels in the last "
               "hour. Anything above zero means the upstream had trouble."),
     stat("Uptime", {"h": 4, "w": 3, "x": 12, "y": 1},
          targets(target("modem_uptime_seconds")), unit="s"),

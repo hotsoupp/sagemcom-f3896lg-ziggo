@@ -25,6 +25,33 @@ groups:
           summary: "Modem is accumulating uncorrectable FEC errors"
           description: "{{ $value | printf \"%.3f\" }} uncorrected codewords/s over the last 5m."
 
+      - alert: ModemChannelUnlocked
+        expr: count((modem_downstream_locked == 0) or (modem_upstream_locked == 0)) > 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "A modem channel lost lock"
+          description: "One or more DOCSIS channels have been unlocked for 2 minutes."
+
+      - alert: ModemRangingTimeouts
+        expr: sum(increase(modem_upstream_ranging_timeouts_total{timer=~"t3|t4"}[15m])) > 3
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Modem is seeing T3 or T4 ranging timeouts"
+          description: "More than 3 T3 or T4 ranging timeouts occurred in 15 minutes."
+
+      - alert: ModemEndpointUnavailable
+        expr: modem_endpoint_up{endpoint=~"state|eventlog|serviceflows|localization|modemmode"} == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "An optional modem endpoint is unavailable"
+          description: "{{ $labels.endpoint }} has failed for 5 minutes while the modem remains reachable."
+
       - alert: ModemExporterStalled
         expr: (time() - modem_last_poll_timestamp_seconds) > 180
         for: 2m
