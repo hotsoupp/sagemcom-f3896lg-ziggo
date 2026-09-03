@@ -82,7 +82,9 @@ LOG_PATTERNS = [
 ]
 
 _lock = threading.Lock()
+_refresh_lock = threading.Lock()
 _cache = {"at": 0.0, "body": ""}
+_last_success_at = 0.0
 
 
 def parse_events(events):
@@ -131,16 +133,33 @@ def block(name, help_text, kind, samples):
 
 
 def collect():
+    global _last_success_at
     started = time.time()
     lines = []
     flows, localization, modemmode = [], {}, {}
+    endpoint_status = {
+        name: 0
+        for name in (
+            "downstream",
+            "upstream",
+            "state",
+            "eventlog",
+            "serviceflows",
+            "localization",
+            "modemmode",
+        )
+    }
     try:
-        ds, us, cm, events = modem.fetch_snapshot()
+        ds, us, cm, events = modem.fetch_snapshot(endpoint_status)
         # the exporter-only extras, unauthenticated as well
-        flows = modem.get_optional("/rest/v1/cablemodem/serviceflows", "serviceFlows", [])
-        localization = modem.get_optional("/rest/v1/system/localization", "localization", {})
-        modemmode = modem.get_optional("/rest/v1/system/modemmode", "modemmode", {})
+        flows = modem.get_optional("/rest/v1/cablemodem/serviceflows", "serviceFlows", [],
+                                   endpoint_status, "serviceflows")
+        localization = modem.get_optional("/rest/v1/system/localization", "localization", {},
+                                          endpoint_status, "localization")
+        modemmode = modem.get_optional("/rest/v1/system/modemmode", "modemmode", {},
+                                       endpoint_status, "modemmode")
         up = 1
+        _last_success_at = time.time()
     except Exception as exc:
         print(f"scrape failed: {type(exc).__name__}: {exc}", file=sys.stderr)
         ds = us = events = []
@@ -247,19 +266,25 @@ def collect():
                         for (d, c), pr in sorted(profiles.items())])
 
     lines += block("modem_up", "1 if the last scrape of the modem succeeded.", "gauge", [({}, up)])
+    lines += block("modem_endpoint_up", "1 if the endpoint answered in the last poll.", "gauge",
+                   [({"endpoint": name}, success) for name, success in sorted(endpoint_status.items())])
     lines += block("modem_scrape_duration_seconds", "Duration of the last modem poll.", "gauge",
                    [({}, round(time.time() - started, 3))])
     lines += block("modem_last_poll_timestamp_seconds",
                    "Unix time of the last modem poll; alert if this goes stale.", "gauge",
                    [({}, round(time.time(), 3))])
+    lines += block("modem_last_success_timestamp_seconds",
+                   "Unix time of the last successful required-endpoint poll.", "gauge",
+                   [({}, round(_last_success_at, 3))] if _last_success_at else [])
     return "\n".join(lines) + "\n"
 
 
 def refresh():
-    body = collect()
-    with _lock:
-        _cache["body"] = body
-        _cache["at"] = time.time()
+    with _refresh_lock:
+        body = collect()
+        with _lock:
+            _cache["body"] = body
+            _cache["at"] = time.time()
 
 
 def poller():
@@ -286,16 +311,28 @@ def poller():
 def cached():
     with _lock:
         body = _cache["body"]
-    if not body:                                      # first scrape before the poller runs
-        refresh()
-        with _lock:
-            body = _cache["body"]
-    return body
+    if body:
+        return body
+    return "\n".join([
+        "# HELP modem_up 1 if the last scrape of the modem succeeded.",
+        "# TYPE modem_up gauge",
+        "modem_up 0",
+        "",
+    ])
 
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        if self.path.split("?")[0] not in ("/metrics", "/"):
+        path = self.path.split("?")[0]
+        if path == "/healthz":
+            body = b"ok\n"
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        if path not in ("/metrics", "/"):
             self.send_response(404)
             self.end_headers()
             return
@@ -314,9 +351,9 @@ def main():
     if "--print" in sys.argv:
         sys.stdout.write(collect())
         return
-    refresh()                                         # warm the cache before serving
+    threading.Thread(target=refresh, daemon=True).start()
     threading.Thread(target=poller, daemon=True).start()
-    print(f"modem exporter listening on {BIND}:{PORT}/metrics "
+    print(f"modem exporter listening on {BIND}:{PORT}/metrics and /healthz "
           f"(polling the modem every {INTERVAL:g}s, no credentials used)")
     ThreadingHTTPServer((BIND, PORT), Handler).serve_forever()
 

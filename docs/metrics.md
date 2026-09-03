@@ -30,8 +30,10 @@ All metrics exposed by `exporter.py` on `/metrics`.
 | `modem_log_events_in_window`             | Parsed event types in the log window |
 | `modem_cm_status_events_in_window`       | CM-STATUS events by DOCSIS type code |
 | `modem_up`                               | 1 if the last modem poll succeeded |
+| `modem_endpoint_up`                      | 1 if an endpoint answered in the last poll |
 | `modem_scrape_duration_seconds`          | How long the last poll took |
 | `modem_last_poll_timestamp_seconds`      | When the last poll happened |
+| `modem_last_success_timestamp_seconds`   | When required modem endpoints last succeeded |
 
 A note on the event-log metrics: the modem's event log is a rolling window, so
 older entries drop off over time. Those metrics are gauges counting what is
